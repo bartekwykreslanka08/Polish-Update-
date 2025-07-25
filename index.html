@@ -1,182 +1,41 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
+<DOCUMENT filename="index.html">
 
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
+    
+        Polish Update 🇵🇱
 
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
+        Wersja 0.1
 
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polish Update</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f4f8;
-            color: #333;
-            overflow-x: hidden;
-        }
-        .container {
-            max-width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .header {
-            text-align: center;
-            font-size: 2.5em;
-            color: #d32f2f;
-            margin: 20px 0;
-            animation: slideIn 1s ease-out;
-        }
-        .header span {
-            font-size: 1.2em;
-        }
-        .tab {
-            background-color: #ffffff;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            cursor: pointer;
-            margin: 10px;
-            font-size: 1.2em;
-            transition: transform 0.3s ease, background-color 0.3s ease;
-        }
-        .tab:hover {
-            transform: scale(1.05);
-            background-color: #e0f7fa;
-        }
-        .content {
-            display: none;
-            padding: 20px;
-            animation: fadeIn 1s ease-in;
-        }
-        .content.active {
-            display: block;
-        }
-        .update-title {
-            font-size: 1.8em;
-            color: #1976d2;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .update-item {
-            margin-bottom: 30px;
-            background-color: #ffffff;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            animation: slideUp 0.8s ease-out;
-        }
-        .update-item img {
-            width: 100%;
-            max-height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
-        .update-item h3 {
-            font-size: 1.5em;
-            color: #388e3c;
-            margin-bottom: 10px;
-        }
-        .update-item p {
-            font-size: 1em;
-            line-height: 1.6;
-        }
-        .ending {
-            text-align: center;
-            font-size: 1.2em;
-            color: #d81b60;
-            margin-top: 30px;
-            animation: fadeIn 1s ease-in;
-        }
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @media (min-width: 768px) {
-            .container { max-width: 700px; margin: auto; }
-            .header { font-size: 3em; }
-            .tab { font-size: 1.5em; }
-            .update-title { font-size: 2em; }
-            .update-item img { max-height: 300px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1 class="header">Polish Update <span>🇵🇱</span></h1>
-        <div class="tab" onclick="showContent()">Wersja 0.1</div>
-        <div class="content" id="updateContent">
-            <h2 class="update-title">Witajcie w wielkiej letniej aktualizacji Polski!</h2>
-            <p>Przygotujcie się na gorące dni pełne nowych przygód, smaków i wyzwań. W tym sezonie wprowadzamy soczyste nowości, które rozgrzeją wasze serca i dodadzą kolorytu do rozgrywki. Oto pierwsze atrakcje, które dla was przygotowaliśmy:</p>
-            <div class="update-item">
-                <img src="https://images.unsplash.com/photo-1601001435829-5034b9b92d0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Letnie Burze">
-                <h3>Event: Letnie Burze</h3>
-                <p>Niebo nad Polską czasem się chmurzy! Nowy event "Letnie Burze" przynosi dynamiczne zmiany w rozgrywce. Burze mogą zaskoczyć was w najmniej oczekiwanym momencie, oferując unikalne wyzwania, takie jak zbieranie specjalnych przedmiotów w deszczu czy ochrona swoich upraw przed ulewą. Uważajcie na błyskawice – każda burza to szansa na rzadkie nagrody, ale i ryzyko utraty punktów, jeśli nie będziecie przygotowani!</p>
-            </div>
-            <div class="update-item">
-                <img src="https://images.unsplash.com/photo-1596399465457-12174f5f1137?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Truskawki">
-                <h3>Nowy item w sklepie: Truskawki</h3>
-                <p>Czerwone, soczyste i pachnące latem – truskawki trafiają do sklepu! Ten nowy item nie tylko doda wam energii, ale też pozwoli na tworzenie wyjątkowych przepisów, takich jak truskawkowe przetwory czy koktajle. Zbierajcie je na polach lub kupujcie w sklepie, by wzbogacić swoje kulinarne przygody i zdobyć bonusowe punkty za letnie smakołyki!</p>
-            </div>
-            <div class="update-item">
-                <img src="https://images.unsplash.com/photo-1591578901411-473ba4b4f9f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Pszczoły">
-                <h3>Zwiększona szansa na Pszczoły</h3>
-                <p>Bzzz! Pszczoły są gwiazdami tego lata! Zwiększyliśmy szansę na pojawianie się tych pracowitych owadów na łąkach i w ogrodach. Teraz łatwiej będzie zebrać miód, który możecie wykorzystać do ulepszeń lub wymienić na specjalne dekoracje inspirowane naturą. Pomagajcie pszczołom w zapylaniu kwiatów, a one odwdzięczą się wam unikalnymi bonusami!</p>
-            </div>
-            <div class="ending">To dopiero początek letnich nowości! Wkrótce pojawią się kolejne atrakcje, więc bądźcie gotowi na więcej niespodzianek!</div>
-        </div>
-    </div>
-    <script>
-        function showContent() {
-            const content = document.getElementById('updateContent');
-            content.classList.toggle('active');
-        }
-    </script>
-</body>
-</html>
+        
+            Witajcie w wielkiej letniej aktualizacji Polski!
+
+            Przygotujcie się na gorące dni pełne nowych przygód, smaków i wyzwań. W tym sezonie wprowadzamy soczyste nowości, które rozgrzeją wasze serca i dodadzą kolorytu do rozgrywki. Oto pierwsze atrakcje, które dla was przygotowaliśmy:
+
+            
+                
+                Event: Letnie Burze
+
+                Niebo nad Polską czasem się chmurzy! Nowy event "Letnie Burze" przynosi dynamiczne zmiany w rozgrywce. Burze mogą zaskoczyć was w najmniej oczekiwanym momencie, oferując unikalne wyzwania, takie jak zbieranie specjalnych przedmiotów w deszczu czy ochrona swoich upraw przed ulewą. Uważajcie na błyskawice – każda burza to szansa na rzadkie nagrody, ale i ryzyko utraty punktów, jeśli nie będziecie przygotowani!
+                <img src="burza.jpg" alt="Letnie Burze" style="width: 100%; height: auto;">
+
+            
+                
+                Nowy item w sklepie: Truskawki
+
+                Czerwone, soczyste i pachnące latem – truskawki trafiają do sklepu! Ten nowy item nie tylko doda wam energii, ale też pozwoli na tworzenie wyjątkowych przepisów, takich jak truskawkowe przetwory czy koktajle. Zbierajcie je na polach lub kupujcie w sklepie, by wzbogacić swoje kulinarne przygody i zdobyć bonusowe punkty za letnie smakołyki!
+                <img src="truskawki.jpg" alt="Truskawki" style="width: 100%; height: auto;">
+
+            
+                
+                Zwiększona szansa na Pszczoły
+
+                Bzzz! Pszczoły są gwiazdami tego lata! Zwiększyliśmy szansę na pojawianie się tych pracowitych owadów na łąkach i w ogrodach. Teraz łatwiej będzie zebrać miód, który możecie wykorzystać do ulepszeń lub wymienić na specjalne dekoracje inspirowane naturą. Pomagajcie pszczołom w zapylaniu kwiatów, a one odwdzięczą się wam unikalnymi bonusami!
+                <img src="osa.jpg" alt="Pszczoły" style="width: 100%; height: auto;">
+
+            
+
+            To dopiero początek letnich nowości! Wkrótce pojawią się kolejne atrakcje, więc bądźcie gotowi na więcej niespodzianek!
+
+        
+
+    
+</DOCUMENT>
