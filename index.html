@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polish Update - Oficjalna Strona</title>
+    <style>
+        :root {
+            --primary-color: #dc3545;
+            --secondary-color: #ffffff;
+            --bg-gradient-start: #f8f9fa;
+            --bg-gradient-end: #e9ecef;
+            --card-bg: #ffffff;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --accent-warm: #fd7e14;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --border-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            /* Płynne przejście przy zmianie motywu */
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        /* Nagłówek strony */
+        header {
+            width: 100%;
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: background 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Kontener na tytuł i licznik */
+        .title-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-content h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #111;
+            text-transform: uppercase;
+            transition: color 0.4s ease;
+        }
+
+        /* Licznik odliczający czas */
+        .countdown-timer {
+            font-size: 13px;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-top: 8px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.05), rgba(220, 53, 69, 0.15));
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 20px;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.08);
+            letter-spacing: 0.5px;
+            text-align: center;
+            /* Zapewnia stałą szerokość cyfr, by uniknąć migotania przy milisekundach */
+            font-variant-numeric: tabular-nums; 
+        }
+
+        .flag-container {
+            display: flex;
+            flex-direction: column;
+            width: 45px;
+            height: 30px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: border-color 0.4s ease;
+        }
+
+        .flag-top {
+            background-color: #fff;
+            flex: 1;
+        }
+
+        .flag-bottom {
+            background-color: #dc3545;
+            flex: 1;
+        }
+
+        /* Główny kontener */
+        main {
+            max-width: 800px;
+            width: 100%;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .welcome-section h2 {
+            font-size: 24px;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+
+        /* Zakładka / Przycisk do otwierania */
+        .tab-trigger {
+            background: var(--card-bg);
+            border: none;
+            padding: 20px 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .tab-trigger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            border-color: rgba(220, 53, 69, 0.2);
+        }
+
+        .tab-trigger .icon {
+            font-size: 22px;
+            transition: transform 0.3s ease;
+        }
+
+        /* Okno modalne */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-window {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 750px;
+            max-height: 85vh;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal-window {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Nagłówek Okienka */
+        .modal-header {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(90deg);
+        }
+
+        /* Zawartość Okienka (Scrollowalna) */
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            background: #fafafa;
+            transition: background 0.4s ease;
+        }
+
+        /* Style dla załadowanych z Update1.html aktualizacji */
+        .update-item {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            border: 1px solid #f0f0f0;
+            transition: background 0.4s ease, border-color 0.4s ease;
+        }
+
+        .update-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.4s ease;
+        }
+
+        .thematic-image {
+            width: 100%;
+            height: 180px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.2);
+        }
+
+        /* Twoje oryginalne zdjęcia */
+        .img-1 { background: url('10407.png') center/cover no-repeat; }
+        .img-2 { background: url('20407.png') center/cover no-repeat; }
+        .img-3 { background: url('30407.png') center/cover no-repeat; }
+        .img-4 { background: url('40407.png') center/cover no-repeat; }
+        .img-5 { background: url('50407.png') center/cover no-repeat; }
+        .img-6 { background: url('60407.png') center/cover no-repeat; }
+        .img-7 { background: url('70407.png') center/cover no-repeat; }
+        .img-8 { background: url('80407.png') center/cover no-repeat; }
+        .img-9 { background: url('90407.png') center/cover no-repeat; }
+        .img-10 { background: url('100407.png') center/cover no-repeat; }
+        .img-11 { background: url('110407.png') center/cover no-repeat; }
+        .img-12 { background: url('120407.png') center/cover no-repeat; }
+        .img-13 { background: url('130407.png') center/cover no-repeat; }
+        .img-14 { background: url('140407.png') center/cover no-repeat; }
+        .img-15 { background: url('150407.png') center/cover no-repeat; }
+        .img-16 { background: url('160407.png') center/cover no-repeat; }
+        .img-17 { background: url('170407.png') center/cover no-repeat; }
+        .img-18 { background: url('180407.png') center/cover no-repeat; }
+
+        .thematic-image::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.1);
+        }
+
+        .update-details {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #495057;
+            transition: color 0.4s ease;
+        }
+
+        .update-details p {
+            margin-bottom: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .update-details p:last-child {
+            margin-bottom: 0;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #fafafa;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #b3b3b3;
+        }
+
+        /* Stopka strony */
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+            width: 100%;
+        }
+
+        /* =========================================
+           TRYB CIEMNY (DARK MODE) ORAZ PRZEŁĄCZNIK
+           ========================================= */
+        
+        /* Wygląd estetycznego przełącznika (w prawym górnym rogu nagłówka) */
+        .theme-toggle {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 64px;
+            height: 32px;
+            background: #e9ecef;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05);
+            transition: background 0.4s ease, border-color 0.4s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+            z-index: 50;
+        }
+
+        .theme-toggle .toggle-emoji {
+            font-size: 14px;
+            line-height: 1;
+            z-index: 1;
+            user-select: none;
+        }
+
+        .theme-toggle .toggle-ball {
+            position: absolute;
+            left: 4px;
+            width: 24px;
+            height: 24px;
+            background: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 2;
+        }
+
+        /* Mobilny widok przełącznika */
+        @media (max-width: 550px) {
+            .theme-toggle {
+                top: 15px;
+                right: 15px;
+                transform: scale(0.85);
+            }
+        }
+
+        /* Główne zmienne i nadpisania gdy Dark Mode jest aktywny */
+        body.dark-mode {
+            --bg-gradient-start: #121212;
+            --bg-gradient-end: #1e1e1e;
+            --card-bg: #2a2a2a;
+            --text-main: #f1f1f1;
+            --text-muted: #a0a0a0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Elementy statyczne */
+        body.dark-mode header { background: #1a1a1a; box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+        body.dark-mode .header-content h1 { color: #f1f1f1; }
+        body.dark-mode .flag-container { border-color: #333; }
+        body.dark-mode .tab-trigger { color: #f1f1f1; }
+        body.dark-mode .modal-body { background: #1a1a1a; }
+        body.dark-mode .modal-body::-webkit-scrollbar-track { background: #1a1a1a; }
+        body.dark-mode .modal-body::-webkit-scrollbar-thumb { background: #444; }
+
+        /* Elementy dynamiczne ładujące się z zewnętrznego pliku (Update1.html) */
+        body.dark-mode .update-item { background: #242424; border-color: #333; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        body.dark-mode .update-title { color: #f1f1f1; }
+        body.dark-mode .update-details { color: #b3b3b3; }
+
+        /* Zmiana wyglądu samego przełącznika gdy jest ciemno */
+        body.dark-mode .theme-toggle {
+            background: #3a3a3a;
+            border-color: rgba(255,255,255,0.1);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+        }
+        body.dark-mode .theme-toggle .toggle-ball {
+            transform: translateX(32px);
+            background: #1a1a1a;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.6), inset 0 0 2px rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <div class="flag-container">
+                <div class="flag-top"></div>
+                <div class="flag-bottom"></div>
+            </div>
+            <div class="title-container">
+                <h1>Polish Update</h1>
+                <div id="countdown" class="countdown-timer">Ładowanie licznika...</div>
+            </div>
+        </div>
+
+        <div class="theme-toggle" id="themeToggle" title="Zmień motyw">
+            <span class="toggle-emoji">☀️</span>
+            <span class="toggle-emoji">🌙</span>
+            <div class="toggle-ball"></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="welcome-section">
+            <h2>Witaj na oficjalnej platformie patchy rzeczywistości</h2>
+            <p style="color: var(--text-muted);">Kliknij poniższą zakładkę, aby zobaczyć najnowsze zmiany.</p>
+        </div>
+
+        <button class="tab-trigger" id="openModalBtn" data-file="Update1.html">
+            <span class="icon">📅</span>
+            <span>4 Lipca 2026</span>
+        </button>
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h2 id="modalTitle">🇵🇱 POLISH UPDATE – 4 LIPCA 2026 ☀️</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBodyContent"></div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Polish Update Website. Wszelkie prawa zastrzeżone.
+    </footer>
+
+    <script>
+        // Czekamy aż cała strona się załaduje, by uniknąć błędów
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- DARK MODE LOGIKA ---
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+
+            // Sprawdzanie czy użytkownik miał już włączony tryb ciemny w przeglądarce
+            if (localStorage.getItem('theme') === 'dark') {
+                body.classList.add('dark-mode');
+            }
+
+            // Kliknięcie w przełącznik
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    body.classList.toggle('dark-mode');
+                    if (body.classList.contains('dark-mode')) {
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        localStorage.setItem('theme', 'light');
+                    }
+                });
+            }
+
+            // --- LICZNIK ---
+            const countdownElement = document.getElementById("countdown");
+            
+            // Format ISO ustawiony na 7 lipca 2026 godzina 10:00:00
+            const countDownDate = new Date("2026-07-07T10:00:00").getTime();
+
+            function updateTimer() {
+                const now = new Date().getTime();
+                const distance = countDownDate - now;
+
+                if (distance < 0) {
+                    countdownElement.innerHTML = "Czas minął! Oczekuj nowej aktualizacji.";
+                    return true;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                // Dodajemy milisekundy i wymuszamy wyświetlanie 3 znaków (np. 045, 982)
+                const milliseconds = Math.floor(distance % 1000).toString().padStart(3, '0');
+
+                countdownElement.innerHTML = "Do Kolejnego Update: " + days + " dni " + hours + " godz. " + minutes + " min. " + seconds + " sek. " + milliseconds + " ms";
+                return false;
+            }
+
+            // Uruchomienie licznika od razu
+            if (countdownElement) {
+                const isFinished = updateTimer();
+                if (!isFinished) {
+                    // Odświeżanie co 10 milisekund (a nie co 1 sekundę) dla płynności
+                    setInterval(updateTimer, 10);
+                }
+            }
+
+            // --- OTWIERANIE ZAKŁADEK (MODAL) ---
+            const openModalBtn = document.getElementById('openModalBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalBodyContent = document.getElementById('modalBodyContent');
+
+            if (openModalBtn && modalOverlay && modalBodyContent) {
+                openModalBtn.addEventListener('click', function() {
+                    
+                    modalOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden'; 
+                    
+                    const fileToLoad = this.getAttribute('data-file');
+
+                    // Sprawdzamy czy zawartość jest pusta. Jak tak, pobieramy
+                    if (modalBodyContent.innerHTML.trim() === '') {
+                        modalBodyContent.innerHTML = '<p style="text-align:center; padding: 30px; font-weight:bold;">Trwa pobieranie łatki...</p>';
+                        
+                        fetch(fileToLoad)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Błąd pliku: ' + response.status);
+                                }
+                                return response.text();
+                            })
+                            .then(data => {
+                                modalBodyContent.innerHTML = data;
+                            })
+                            .catch(error => {
+                                modalBodyContent.innerHTML = '<p style="text-align:center; padding: 30px; color:red;">Nie udało się załadować danych z pliku ' + fileToLoad + '. Upewnij się, że plik na GitHubie ma dokładnie taką samą nazwę (duża litera "U" ma znaczenie!).</p>';
+                                console.error('Błąd fetch:', error);
+                            });
+                    }
+                });
+            }
+
+            // Zamykanie okienka
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', () => {
+                    modalOverlay.classList.remove('active');
+                    document.body.style.overflow = ''; 
+                });
+            }
+
+            // Zamknięcie po kliknięciu w tło
+            if (modalOverlay) {
+                modalOverlay.addEventListener('click', (e) => {
+                    if (e.target === modalOverlay) {
+                        modalOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+            
+        });
+    </script>
+</body>
+</html>
