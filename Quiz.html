@@ -11,6 +11,7 @@
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                 <span id="quiz-progress" style="font-weight: bold;">Pytanie 1/30</span>
             </div>
+            <!-- Pasek czasu -->
             <div style="width: 100%; height: 12px; background: #e0e0e0; border-radius: 6px; overflow: hidden;">
                 <div id="quiz-timer-bar" style="height: 100%; width: 100%; background-color: #4CAF50; transition: width 1s linear, background-color 0.5s;"></div>
             </div>
@@ -355,6 +356,7 @@
         <button id="retry-quiz-btn" class="tab-trigger" style="margin: 30px auto;">Spróbuj ponownie 🔄</button>
     </div>
 
+    <!-- SKRYPT Z LOSOWANIEM PYTAŃ I ODPOWIEDZI -->
     <script>
     document.addEventListener("DOMContentLoaded", function() {
         const startBtn = document.getElementById("start-quiz-btn");
@@ -366,15 +368,14 @@
         const timerBar = document.getElementById("quiz-timer-bar");
         const scoreText = document.getElementById("quiz-score");
         
-        // Zbieramy pytania tylko w formie stałej tablicy
         let allQuestions = Array.from(document.querySelectorAll(".quiz-question-item"));
-        let questionOrder = []; // Tutaj będziemy trzymać naszą wylosowaną kolejność
+        let questionOrder = []; 
         let currentQuestionIndex = 0;
         let score = 0;
         let timeLeft = 20;
         let timerInterval;
 
-        // Doskonały algorytm tasowania Fisher-Yates
+        // Doskonały algorytm tasowania Fisher-Yates (używany i dla pytań i dla odpowiedzi)
         function shuffle(array) {
             let currentIndex = array.length, randomIndex;
             while (currentIndex !== 0) {
@@ -396,7 +397,7 @@
             // Generujemy tablicę z numerami od 0 do 29
             questionOrder = Array.from({length: allQuestions.length}, (_, i) => i);
             
-            // Tasujemy tylko numery indeksów (kod HTML zostaje całkowicie bezpieczny)
+            // Tasujemy numery indeksów pytań
             shuffle(questionOrder);
             
             showQuestion();
@@ -411,7 +412,7 @@
             // Najpierw fizycznie ukrywamy wszystkie pytania
             allQuestions.forEach(q => q.style.display = "none");
             
-            // Pobieramy numer (indeks) z przetasowanej tablicy
+            // Pobieramy numer (indeks) z przetasowanej tablicy pytań
             let realIndex = questionOrder[currentQuestionIndex];
             
             // Wskazujemy konkretne pytanie i je pokazujemy
@@ -426,6 +427,29 @@
             titleElement.innerText = `${currentQuestionIndex + 1}. ${titleElement.dataset.originalText}`;
             
             progressText.innerHTML = `Pytanie ${currentQuestionIndex + 1}/30`;
+            
+            // --- TASOWANIE ODPOWIEDZI ---
+            const optionsContainer = currentQ.querySelector('.quiz-options');
+            let btns = Array.from(optionsContainer.querySelectorAll('.quiz-btn'));
+            
+            // Wyodrębniamy czysty tekst (bez A, B, C, D) przy pierwszym wejściu
+            btns.forEach(btn => {
+                if (!btn.dataset.rawText) {
+                    btn.dataset.rawText = btn.innerText.replace(/^[A-D]\)\s*/, '');
+                }
+            });
+            
+            // Tasujemy przyciski
+            shuffle(btns);
+            
+            // Przypisujemy ładne literki z powrotem, w nowej, losowej kolejności,
+            // i fizycznie umieszczamy je w kontenerze w nowym porządku
+            const prefixes = ["A) ", "B) ", "C) ", "D) "];
+            btns.forEach((btn, index) => {
+                btn.innerText = prefixes[index] + btn.dataset.rawText;
+                optionsContainer.appendChild(btn); 
+            });
+            // ----------------------------
             
             // --- MECHANIZM PASKA CZASU ---
             clearInterval(timerInterval);
@@ -454,8 +478,9 @@
 
             // Podpięcie przycisków tylko raz, chronione znacznikiem
             if (!currentQ.dataset.listenersAdded) {
-                const btns = currentQ.querySelectorAll(".quiz-btn");
-                btns.forEach(btn => {
+                // Musimy pobrać je z currentQ, ponieważ 'btns' to tylko nasza lokalna tablica
+                const actualBtns = currentQ.querySelectorAll(".quiz-btn");
+                actualBtns.forEach(btn => {
                     btn.onclick = function() {
                         clearInterval(timerInterval);
                         let selectedIdx = parseInt(this.getAttribute("data-index"));
