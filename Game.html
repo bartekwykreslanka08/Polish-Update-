@@ -1,7 +1,12 @@
 <div id="game-app">
     <div id="game-start-screen" style="text-align: center; padding: 40px 20px;">
-        <h2 style="font-size: 26px; margin-bottom: 15px; color:#fff;">Łapanie Flagi 🇵🇱</h2>
-        <p style="color: var(--text-muted); margin-bottom: 30px;">Przesuwaj koszykiem (dotykając lub używając myszki) w lewo i prawo, aby łapać spadające flagi Polski. <br><br>Masz <strong>30 sekund</strong> na zebranie jak największej ilości punktów!</p>
+        <h2 style="font-size: 26px; margin-bottom: 15px; color:#fff;">Łapanie Zdjęć 📸</h2>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Przesuwaj koszykiem, aby łapać zdjęcia <strong>(+1 pkt)</strong>. Uważaj na bomby <strong>(-2 pkt)</strong>!<br><br>Masz <strong>30 sekund</strong>.</p>
+        
+        <p style="font-size: 16px; color: #FFD700; font-weight: bold; margin-bottom: 25px;">
+            🏆 Twój Rekord: <span id="high-score-display">0</span>
+        </p>
+
         <button id="start-game-btn" class="tab-trigger" style="margin: 0 auto; min-width: 200px;">Graj 🎮</button>
     </div>
 
@@ -11,15 +16,22 @@
             <span style="color: #fff;">Punkty: <span id="game-score-display" style="color: #4CAF50;">0</span></span>
         </div>
         
-        <!-- Obszar gry ze zablokowanym scrollem (touch-action: none) -->
-        <div id="game-area" style="width: 100%; height: 350px; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; position: relative; overflow: hidden; touch-action: none; cursor: crosshair;">
-            <div id="basket" style="position: absolute; bottom: 5px; left: 50%; font-size: 45px; transform: translateX(-50%); pointer-events: none; z-index: 10; user-select: none;">🧺</div>
+        <!-- Obszar gry powiększony do 500px -->
+        <div id="game-area" style="width: 100%; height: 500px; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; position: relative; overflow: hidden; touch-action: none; cursor: crosshair;">
+            
+            <!-- Koszyk jako obraz Koszyk.png -->
+            <div id="basket" style="position: absolute; bottom: 5px; left: 50%; width: 70px; height: 70px; transform: translateX(-50%); background: url('Koszyk.png') center/contain no-repeat; pointer-events: none; z-index: 10; user-select: none;"></div>
+            
         </div>
     </div>
 
     <div id="game-end-screen" style="display:none; text-align: center; padding: 40px 20px;">
         <h2 style="font-size: 28px; margin-bottom: 10px; color:#fff;">Koniec Czasu!</h2>
-        <p style="font-size: 18px; color: var(--text-muted);">Udało Ci się złapać: <strong style="color: var(--primary-color); font-size: 24px;"><span id="final-score">0</span> flag</strong></p>
-        <button id="retry-game-btn" class="tab-trigger" style="margin: 30px auto; min-width: 200px;">Zagraj ponownie 🔄</button>
+        
+        <p style="font-size: 18px; color: var(--text-muted); margin-bottom: 10px;">Zebrałeś łącznie: <br><strong style="color: var(--primary-color); font-size: 28px;"><span id="final-score">0</span> pkt</strong></p>
+        
+        <p style="font-size: 16px; color: #FFD700; margin-bottom: 30px;">🏆 Twój Rekord: <strong><span id="final-highscore">0</span></strong></p>
+
+        <button id="retry-game-btn" class="tab-trigger" style="margin: 0 auto; min-width: 200px;">Zagraj ponownie 🔄</button>
     </div>
 </div>
