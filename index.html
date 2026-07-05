@@ -1,750 +1,729 @@
-<!DOCTYPE html>  
-<html lang="pl">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>Polish Update - Oficjalna Strona</title>  
-    <style>  
-        :root {  
-            --primary-color: #dc3545;  
-            --accent-warm: #fd7e14;  
-            /* Zmienne dla efektu szkła (Glassmorphism) */
-            --glass-bg: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            --text-main: #ffffff;  
-            --text-muted: #e0e0e0;  
-            --border-radius: 16px;  
-        }  
-        
-        * {  
-            box-sizing: border-box;  
-            margin: 0;  
-            padding: 0;  
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
-        }  
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polish Update - Oficjalna Strona</title>
+    <style>
+        :root {
+            --primary-color: #dc3545;
+            --primary-hover: #ff4d5e;
+            --glass-bg: rgba(30, 30, 30, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --text-muted: #cccccc;
+            --border-radius: 16px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
 
-        body {  
-            background-color: #1a1a1a;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            /* Tło będzie podmieniane przez JS, to jest domyślny fallback */
+            background-color: #121212;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            color: var(--text-main);  
-            min-height: 100vh;  
-            display: flex;  
-            flex-direction: column;  
-            align-items: center;  
-            overflow-x: hidden;  
-            transition: background-image 1s ease-in-out;
-        }  
+            transition: background-image 1.5s ease-in-out;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
 
-        /* Przyciemnienie tła pod efekt szkła */
-        body::before {
-            content: '';
+        /* Przyciemnienie tła (overlay) */
+        .bg-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); /* Moc przyciemnienia */
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(6px); /* Lekkie rozmycie samego tła */
             z-index: -1;
         }
 
-        header {  
-            width: 100%;  
+        header {
+            width: 100%;
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-            padding: 20px;  
-            display: flex;  
-            justify-content: center;  
-            align-items: center;  
-            position: relative;  
-        }  
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
 
-        .header-content {  
-            display: flex;  
-            align-items: center;  
-            gap: 15px;  
-        }  
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-        .title-container {  
-            display: flex;  
-            flex-direction: column;  
-            align-items: flex-start;  
-        }  
+        .title-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
 
-        .header-content h1 {  
-            font-size: 28px;  
-            font-weight: 800;  
-            letter-spacing: -0.5px;  
-            color: #fff;  
-            text-transform: uppercase;  
-        }  
+        .header-content h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+            text-transform: uppercase;
+        }
 
-        .schedule-info {  
-            font-size: 11px;  
-            font-weight: 700;  
-            color: var(--text-muted);  
-            text-transform: uppercase;  
-            letter-spacing: 1px;  
-            margin-bottom: -2px;  
-            margin-top: 4px;  
-        }  
+        .schedule-info {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: -2px;
+            margin-top: 4px;
+        }
 
-        .countdown-timer {  
-            font-size: 13px;  
-            color: #ff6b6b;  
-            font-weight: 700;  
-            margin-top: 5px;  
-            padding: 6px 14px;  
-            background: rgba(220, 53, 69, 0.15);  
-            border: 1px solid rgba(220, 53, 69, 0.4);  
-            border-radius: 20px;  
-            display: inline-block;  
-            letter-spacing: 0.5px;  
-            font-variant-numeric: tabular-nums;   
-        }  
+        .countdown-timer {
+            font-size: 13px;
+            color: #ff6b7a;
+            font-weight: 700;
+            margin-top: 5px;
+            padding: 6px 14px;
+            background: rgba(220, 53, 69, 0.15);
+            border: 1px solid rgba(220, 53, 69, 0.4);
+            border-radius: 20px;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+            text-align: center;
+            font-variant-numeric: tabular-nums; 
+        }
 
-        .flag-container {  
-            display: flex;  
-            flex-direction: column;  
-            width: 45px;  
-            height: 30px;  
-            border: 1px solid rgba(255,255,255,0.3);  
-            border-radius: 4px;  
-            overflow: hidden;  
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);  
-        }  
+        .flag-container {
+            display: flex;
+            flex-direction: column;
+            width: 45px;
+            height: 30px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
 
-        .flag-top { background-color: #fff; flex: 1; }  
-        .flag-bottom { background-color: #dc3545; flex: 1; }  
+        .flag-top { background-color: #fff; flex: 1; }
+        .flag-bottom { background-color: #dc3545; flex: 1; }
 
-        main {  
-            max-width: 800px;  
-            width: 100%;  
-            padding: 40px 20px;  
-            display: flex;  
-            flex-direction: column;  
-            align-items: center;  
-            flex: 1;  
-        }  
+        main {
+            max-width: 800px;
+            width: 100%;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
 
-        .welcome-section {  
-            text-align: center;  
-            margin-bottom: 30px;  
-        }  
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-        .welcome-section h2 {  
-            font-size: 24px;  
-            color: #fff;  
-            font-weight: 400;  
-            margin-bottom: 10px;  
-        }  
+        .welcome-section h2 {
+            font-size: 24px;
+            color: #fff;
+            font-weight: 400;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
 
-        .category-section {  
-            width: 100%;  
-            display: flex;  
-            flex-direction: column;  
-            align-items: center;  
-            margin-bottom: 40px;  
-        }  
+        .category-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+        }
 
-        .category-header {  
-            font-size: 24px;  
-            font-weight: 800;  
-            color: #fff;  
-            margin-bottom: 20px;  
-            text-transform: uppercase;  
-            letter-spacing: 2px;  
-            border-bottom: 3px solid var(--primary-color);  
-            padding-bottom: 5px;  
-            display: inline-block;  
-        }  
+        .category-header {
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 5px;
+            display: inline-block;
+        }
 
-        .tabs-container {  
-            display: flex;  
-            gap: 20px;  
-            flex-wrap: wrap;  
-            justify-content: center;  
-        }  
+        .tabs-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
 
-        .tab-trigger {  
+        .tab-trigger {
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            padding: 20px 40px;  
-            border-radius: var(--border-radius);  
-            box-shadow: var(--glass-shadow);  
-            cursor: pointer;  
-            display: flex;  
-            align-items: center;  
-            gap: 15px;  
-            font-size: 18px;  
-            font-weight: 700;  
-            color: #fff;  
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);  
-            min-width: 250px;  
-            justify-content: center;  
-        }  
-
-        .tab-trigger:hover {  
-            transform: translateY(-3px);  
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.4);  
-        }  
-
-        .tab-trigger .icon {  
-            font-size: 22px;  
-        }  
-
-        /* Modal - Szkło */  
-        .modal-overlay {  
-            position: fixed;  
-            top: 0; left: 0; width: 100%; height: 100%;  
-            background: rgba(0, 0, 0, 0.6);  
-            backdrop-filter: blur(8px);  
-            display: flex;  
-            justify-content: center;  
-            align-items: center;  
-            z-index: 1000;  
-            opacity: 0;  
-            pointer-events: none;  
-            transition: opacity 0.4s ease;  
-            padding: 20px;  
-        }  
-
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }  
-
-        .modal-window {  
-            background: var(--glass-bg);  
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            width: 100%;  
-            max-width: 750px;  
-            max-height: 85vh;  
-            border-radius: 24px;  
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);  
-            display: flex;  
-            flex-direction: column;  
-            transform: scale(0.9) translateY(20px);  
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);  
-            overflow: hidden;  
-        }  
-
-        .modal-overlay.active .modal-window { transform: scale(1) translateY(0); }  
-
-        .modal-header {  
-            padding: 25px 30px;  
-            background: rgba(0, 0, 0, 0.4);  
-            color: #fff;  
-            display: flex;  
-            justify-content: space-between;  
-            align-items: center;  
-            border-bottom: 1px solid rgba(255,255,255,0.1);  
-        }  
-
-        .modal-header h2 {  
-            font-size: 20px;  
-            font-weight: 700;  
-            display: flex;  
-            align-items: center;  
-            gap: 10px;  
-        }  
-
-        .close-btn {  
-            background: rgba(255, 255, 255, 0.1);  
-            border: none;  
-            color: white;  
-            width: 36px; height: 36px;  
-            border-radius: 50%;  
-            cursor: pointer;  
-            display: flex;  
-            justify-content: center;  
-            align-items: center;  
-            font-size: 18px;  
-            transition: all 0.2s;  
-        }  
-
-        .close-btn:hover {  
-            background: rgba(255, 255, 255, 0.3);  
-            transform: rotate(90deg);  
-        }  
-
-        .modal-body {  
-            padding: 30px;  
-            overflow-y: auto;  
-            background: transparent;  
-        }  
-
-        .update-item {  
-            background: rgba(0, 0, 0, 0.4);  
-            border-radius: 16px;  
-            padding: 20px;  
-            margin-bottom: 25px;  
-            border: 1px solid rgba(255,255,255,0.1);  
-        }  
-
-        .update-title {  
-            font-size: 18px;  
-            font-weight: 700;  
-            color: #fff;  
-            margin-bottom: 12px;  
-        }  
-
-        .thematic-image {  
-            width: 100%;  
-            height: 180px;  
-            border-radius: 12px;  
-            margin-bottom: 15px;  
-            position: relative;  
-            overflow: hidden;  
-            background-color: rgba(255,255,255,0.1);  
-        }  
-
-        /* --- Style dla Quizu --- */  
-        .quiz-options {  
-            display: grid;  
-            grid-template-columns: 1fr 1fr;  
-            gap: 12px;  
-            margin-top: 15px;  
-        }  
-          
-        .quiz-btn {  
-            background: rgba(255, 255, 255, 0.1);  
-            border: 1px solid rgba(255,255,255,0.2);  
-            padding: 12px 15px;  
-            border-radius: 10px;  
-            font-size: 15px;  
-            font-weight: 600;  
-            color: #fff;  
-            cursor: pointer;  
-            text-align: left;  
-            transition: all 0.2s ease;  
-        }  
-
-        .quiz-btn:hover:not(:disabled) {  
-            border-color: rgba(255,255,255,0.5);  
-            background: rgba(255, 255, 255, 0.2);  
-        }  
-          
-        .quiz-btn:disabled {  
-            cursor: not-allowed;  
-            opacity: 0.9;  
-            color: #fff;  
-        }  
-
-        @media (max-width: 500px) {  
-            .quiz-options { grid-template-columns: 1fr; }  
-        }  
-
-        .modal-body::-webkit-scrollbar { width: 8px; }  
-        .modal-body::-webkit-scrollbar-track { background: transparent; }  
-        .modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }  
-
-        footer {  
-            margin-top: auto;  
-            padding: 20px;  
-            text-align: center;  
-            font-size: 14px;  
-            color: var(--text-muted);  
-            width: 100%;  
-        }  
-
-        /* DARK MODE - Przystosowany do szkła */  
-        .theme-toggle {  
-            position: absolute;  
-            right: 25px; top: 50%;  
-            transform: translateY(-50%);  
-            width: 64px; height: 32px;  
-            background: rgba(255,255,255,0.1);  
-            border-radius: 30px;  
-            cursor: pointer;  
-            display: flex;  
-            align-items: center; justify-content: space-between;  
-            padding: 0 6px;  
-            border: 1px solid rgba(255,255,255,0.2);  
-            z-index: 50;  
-        }  
-        .theme-toggle .toggle-emoji { font-size: 14px; z-index: 1; user-select: none; }  
-        .theme-toggle .toggle-ball {  
-            position: absolute; left: 4px;  
-            width: 24px; height: 24px;  
-            background: #ffffff; border-radius: 50%;  
-            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);  
-            z-index: 2;  
-        }  
-
-        @media (max-width: 550px) {  
-            .theme-toggle { top: 15px; right: 15px; transform: scale(0.85); }  
-        }  
-
-        body.dark-mode::before { background: rgba(0, 0, 0, 0.85); }  
-        body.dark-mode .theme-toggle .toggle-ball { transform: translateX(32px); background: #1a1a1a; }  
-    </style>  
-</head>  
-<body>  
-<header>  
-    <div class="header-content">  
-        <div class="flag-container">  
-            <div class="flag-top"></div>  
-            <div class="flag-bottom"></div>  
-        </div>  
-        <div class="title-container">  
-            <h1>Polish Update</h1>  
-            <div class="schedule-info">Aktualizacje: Wtorek, Czwartek i Sobota</div>  
-            <div id="countdown" class="countdown-timer">Ładowanie licznika...</div>  
-        </div>  
-    </div>  
-
-    <div class="theme-toggle" id="themeToggle" title="Zmień motyw">  
-        <span class="toggle-emoji">☀️</span>  
-        <span class="toggle-emoji">🌙</span>  
-        <div class="toggle-ball"></div>  
-    </div>  
-</header>  
-
-<main>  
-    <div class="welcome-section">  
-        <h2>Witaj na oficjalnej platformie patchy rzeczywistości</h2>  
-        <p style="color: var(--text-muted);">Wybierz odpowiednią zakładkę poniżej.</p>  
-    </div>  
-
-    <div class="category-section">  
-        <h3 class="category-header">Gry</h3>  
-        <div class="tabs-container">  
-            <button class="tab-trigger open-modal-btn" data-file="Quiz.html" data-title="🎮 GRY – QUIZ O POLSCE 🇵🇱">  
-                <span class="icon">🎮</span>  
-                <span>Quiz o Polsce</span>  
-            </button>  
-        </div>  
-    </div>  
-
-    <div class="category-section">  
-        <h3 class="category-header">Update</h3>  
-        <div class="tabs-container">  
-            <button class="tab-trigger open-modal-btn" data-file="Update1.html" data-title="🇵🇱 POLISH UPDATE – 4 LIPCA 2026 ☀️">  
-                <span class="icon">📅</span>  
-                <span>4 Lipca 2026</span>  
-            </button>  
-        </div>  
-    </div>  
-</main>  
-
-<div class="modal-overlay" id="modalOverlay">  
-    <div class="modal-window">  
-        <div class="modal-header">  
-            <h2 id="modalTitle">Ładowanie...</h2>  
-            <button class="close-btn" id="closeModalBtn">&times;</button>  
-        </div>  
-        <div class="modal-body" id="modalBodyContent"></div>  
-    </div>  
-</div>  
-
-<footer>  
-    &copy; 2026 Polish Update Website. Wszelkie prawa zastrzeżone.  
-</footer>  
-
-<script>  
-    document.addEventListener("DOMContentLoaded", () => {  
-        
-        // --- LOSOWE TŁO ZE ZDJĘĆ pl1 - pl10 ---
-        function setRandomBackground() {
-            const randomNum = Math.floor(Math.random() * 10) + 1; // Liczba od 1 do 10
-            // Upewnij się, że masz pliki pl1.jpg, pl2.jpg itd. w folderze ze stroną.
-            document.body.style.backgroundImage = `url('pl${randomNum}.jpg')`;
+            padding: 20px 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 250px;
+            justify-content: center;
         }
-        setRandomBackground();
 
-        // --- DARK MODE ---  
-        const themeToggle = document.getElementById('themeToggle');  
-        const body = document.body;  
-        if (localStorage.getItem('theme') === 'dark') { body.classList.add('dark-mode'); }  
+        .tab-trigger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            border-color: var(--primary-color);
+            background: rgba(40, 40, 40, 0.6);
+        }
 
-        if (themeToggle) {  
-            themeToggle.addEventListener('click', () => {  
-                body.classList.toggle('dark-mode');  
-                localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');  
-            });  
-        }  
+        .tab-trigger .icon {
+            font-size: 22px;
+        }
 
-        // --- LICZNIK ---  
-        const countdownElement = document.getElementById("countdown");  
-        const countDownDate = new Date("2026-07-07T10:00:00").getTime();  
+        /* Modal (Matowe szkło) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            padding: 20px;
+        }
 
-        function updateTimer() {  
-            const now = new Date().getTime();  
-            const distance = countDownDate - now;  
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
-            if (distance < 0) {  
-                countdownElement.innerHTML = "Czas minął! Oczekuj nowej aktualizacji.";  
-                return true;  
-            }  
+        .modal-window {
+            background: rgba(20, 20, 20, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            width: 100%;
+            max-width: 750px;
+            max-height: 85vh;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));  
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));  
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));  
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);  
-            const milliseconds = Math.floor(distance % 1000).toString().padStart(3, '0');  
+        .modal-overlay.active .modal-window { transform: scale(1) translateY(0); }
 
-            countdownElement.innerHTML = "Do Kolejnego Update: " + days + " dni " + hours + " godz. " + minutes + " min. " + seconds + " sek. " + milliseconds + " ms";  
-            return false;  
-        }  
+        .modal-header {
+            padding: 25px 30px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
 
-        if (countdownElement) {  
-            const isFinished = updateTimer();  
-            if (!isFinished) setInterval(updateTimer, 10);  
-        }  
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+        }
 
-        // --- SYSTEM ZAKŁADEK (MODAL) ---  
-        const openModalBtns = document.querySelectorAll('.open-modal-btn');  
-        const closeModalBtn = document.getElementById('closeModalBtn');  
-        const modalOverlay = document.getElementById('modalOverlay');  
-        const modalBodyContent = document.getElementById('modalBodyContent');  
-        const modalTitle = document.getElementById('modalTitle');  
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid transparent;
+            color: white;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
 
-        let currentLoadedFile = '';  
+        .close-btn:hover {
+            background: rgba(220, 53, 69, 0.8);
+            transform: rotate(90deg);
+        }
 
-        // --- ZMIENNE DO LOGIKI QUIZU ---  
-        let quizQuestions = [];  
-        let questionOrder = [];  
-        let quizCurrentIndex = 0;  
-        let quizScore = 0;  
-        let quizTimer = 20;  
-        let quizInterval = null;  
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .update-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .update-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .thematic-image {
+            width: 100%;
+            height: 180px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+            background-color: #222;
+        }
+
+        /* --- Quiz Stylings --- */
+        .quiz-header-bar {
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+            /* Inicjalizacja licznika dla liter A, B, C, D */
+            counter-reset: optionCounter; 
+        }
+        
+        .quiz-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+        }
+
+        .quiz-btn::before {
+            counter-increment: optionCounter;
+            content: counter(optionCounter, upper-alpha) ") ";
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-right: 8px;
+            width: 20px;
+        }
+
+        .quiz-btn:hover:not(:disabled) {
+            border-color: var(--primary-color);
+            background: rgba(220, 53, 69, 0.15);
+            transform: scale(1.02);
+        }
+        
+        .quiz-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+            color: #fff;
+        }
+
+        @media (max-width: 500px) {
+            .quiz-options { grid-template-columns: 1fr; }
+        }
+
+        .modal-body::-webkit-scrollbar { width: 8px; }
+        .modal-body::-webkit-scrollbar-track { background: transparent; }
+        .modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        .modal-body::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="bg-overlay"></div>
+<header>
+    <div class="header-content">
+        <div class="flag-container">
+            <div class="flag-top"></div>
+            <div class="flag-bottom"></div>
+        </div>
+        <div class="title-container">
+            <h1>Polish Update</h1>
+            <div class="schedule-info">Aktualizacje: Wtorek, Czwartek i Sobota</div>
+            <div id="countdown" class="countdown-timer">Ładowanie licznika...</div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="welcome-section">
+        <h2>Witaj na oficjalnej platformie patchy rzeczywistości</h2>
+        <p style="color: var(--text-muted);">Wybierz odpowiednią zakładkę poniżej.</p>
+    </div>
+
+    <div class="category-section">
+        <h3 class="category-header">Gry</h3>
+        <div class="tabs-container">
+            <button class="tab-trigger open-modal-btn" data-file="Quiz.html" data-title="🎮 GRY – QUIZ O POLSCE 🇵🇱">
+                <span class="icon">🎮</span>
+                <span>Quiz o Polsce</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="category-section">
+        <h3 class="category-header">Update</h3>
+        <div class="tabs-container">
+            <button class="tab-trigger open-modal-btn" data-file="Update1.html" data-title="🇵🇱 POLISH UPDATE – 4 LIPCA 2026 ☀️">
+                <span class="icon">📅</span>
+                <span>4 Lipca 2026</span>
+            </button>
+        </div>
+    </div>
+</main>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-window">
+        <div class="modal-header">
+            <h2 id="modalTitle">Ładowanie...</h2>
+            <button class="close-btn" id="closeModalBtn">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBodyContent"></div>
+    </div>
+</div>
+
+<footer>
+    &copy; 2026 Polish Update Website. Wszelkie prawa zastrzeżone.
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        
+        // --- TŁO - LOSOWE ZDJĘCIA (pl1.png - pl10.png) ---
+        let currentBgIndex = Math.floor(Math.random() * 10) + 1;
+        document.body.style.backgroundImage = `url('pl${currentBgIndex}.png')`;
+
+        // Zmiana tła co 15 sekund dla lepszego efektu wizualnego
+        setInterval(() => {
+            currentBgIndex = (currentBgIndex % 10) + 1;
+            document.body.style.backgroundImage = `url('pl${currentBgIndex}.png')`;
+        }, 15000);
+
+        // --- LICZNIK DO UPDATE ---
+        const countdownElement = document.getElementById("countdown");
+        const countDownDate = new Date("2026-07-07T10:00:00").getTime();
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            if (distance < 0) {
+                countdownElement.innerHTML = "Czas minął! Oczekuj nowej aktualizacji.";
+                return true;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            const milliseconds = Math.floor(distance % 1000).toString().padStart(3, '0');
+
+            countdownElement.innerHTML = "Do Kolejnego Update: " + days + " dni " + hours + " godz. " + minutes + " min. " + seconds + " sek. " + milliseconds + " ms";
+            return false;
+        }
+
+        if (countdownElement) {
+            const isFinished = updateTimer();
+            if (!isFinished) setInterval(updateTimer, 10);
+        }
+
+        // --- SYSTEM ZAKŁADEK (MODAL) ---
+        const openModalBtns = document.querySelectorAll('.open-modal-btn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalBodyContent = document.getElementById('modalBodyContent');
+        const modalTitle = document.getElementById('modalTitle');
+
+        let currentLoadedFile = '';
+
+        // --- ZMIENNE DO LOGIKI QUIZU ---
+        let quizQuestions = [];
+        let questionOrder = [];
+        let quizCurrentIndex = 0;
+        let quizScore = 0;
+        let quizTimer = 20;
+        let quizInterval = null;
         let isWaitingForNext = false; 
 
-        function shuffleArray(array) {  
-            let currentIndex = array.length, randomIndex;  
-            while (currentIndex !== 0) {  
-                randomIndex = Math.floor(Math.random() * currentIndex);  
-                currentIndex--;  
-                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];  
-            }  
-            return array;  
-        }  
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
 
-        openModalBtns.forEach(btn => {  
-            btn.addEventListener('click', function() {  
-                const fileToLoad = this.getAttribute('data-file');  
-                const titleText = this.getAttribute('data-title');  
-                  
-                modalTitle.innerText = titleText;  
-                modalOverlay.classList.add('active');  
-                document.body.style.overflow = 'hidden';   
+        openModalBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const fileToLoad = this.getAttribute('data-file');
+                const titleText = this.getAttribute('data-title');
+                
+                modalTitle.innerText = titleText;
+                modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden'; 
 
-                if (currentLoadedFile !== fileToLoad) {  
-                    modalBodyContent.innerHTML = '<p style="text-align:center; padding: 30px; font-weight:bold;">Trwa pobieranie danych...</p>';  
-                      
-                    fetch(fileToLoad)  
-                        .then(response => {  
-                            if (!response.ok) throw new Error('Błąd pliku: ' + response.status);  
-                            return response.text();  
-                        })  
-                        .then(data => {  
-                            modalBodyContent.innerHTML = data;  
-                            currentLoadedFile = fileToLoad;  
-                            clearInterval(quizInterval);  
-                        })  
-                        .catch(error => {  
-                            modalBodyContent.innerHTML = '<p style="text-align:center; padding: 30px; color:#ff6b6b;">Nie udało się załadować danych z pliku ' + fileToLoad + '. Utwórz ten plik w folderze!</p>';  
-                            currentLoadedFile = '';   
-                        });  
-                }  
-            });  
-        });  
+                if (currentLoadedFile !== fileToLoad) {
+                    modalBodyContent.innerHTML = '<p style="text-align:center; padding: 30px; font-weight:bold;">Trwa pobieranie danych...</p>';
+                    
+                    fetch(fileToLoad)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Błąd pliku: ' + response.status);
+                            return response.text();
+                        })
+                        .then(data => {
+                            modalBodyContent.innerHTML = data;
+                            currentLoadedFile = fileToLoad;
+                            clearInterval(quizInterval);
+                        })
+                        .catch(error => {
+                            modalBodyContent.innerHTML = '<p style="text-align:center; padding: 30px; color:#ff4d4d;">Nie udało się załadować danych z pliku ' + fileToLoad + '.</p>';
+                            currentLoadedFile = ''; 
+                            console.error('Błąd fetch:', error);
+                        });
+                }
+            });
+        });
 
-        function closeModal() {  
-            modalOverlay.classList.remove('active');  
-            document.body.style.overflow = '';   
-            clearInterval(quizInterval);   
-        }  
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = ''; 
+            clearInterval(quizInterval); 
+        }
 
-        if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);  
-        if (modalOverlay) {  
-            modalOverlay.addEventListener('click', (e) => {  
-                if (e.target === modalOverlay) closeModal();  
-            });  
-        }  
+        if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeModal();
+            });
+        }
 
-        // --- SILNIK QUIZU ---  
-        modalBodyContent.addEventListener('click', function(e) {  
-            // Start / Restart  
-            if (e.target.id === 'start-quiz-btn' || e.target.id === 'retry-quiz-btn') {  
-                quizQuestions = Array.from(document.querySelectorAll('.quiz-question-item'));  
-                if(quizQuestions.length === 0) return;  
-                  
-                quizCurrentIndex = 0;  
-                quizScore = 0;  
-                isWaitingForNext = false;  
-                  
-                document.getElementById('quiz-start-screen').style.display = 'none';  
-                if (document.getElementById('quiz-end-screen')) document.getElementById('quiz-end-screen').style.display = 'none';  
-                document.getElementById('quiz-question-screen').style.display = 'block';  
-                  
-                // Losowanie pytań  
-                questionOrder = Array.from({length: quizQuestions.length}, (_, i) => i);  
-                shuffleArray(questionOrder);  
+        // --- SILNIK QUIZU (Event Delegation) ---
+        modalBodyContent.addEventListener('click', function(e) {
+            
+            // Start lub Restart
+            if (e.target.id === 'start-quiz-btn' || e.target.id === 'retry-quiz-btn') {
+                quizQuestions = Array.from(document.querySelectorAll('.quiz-question-item'));
+                if(quizQuestions.length === 0) return;
+                
+                quizCurrentIndex = 0;
+                quizScore = 0;
+                isWaitingForNext = false;
+                
+                document.getElementById('quiz-start-screen').style.display = 'none';
+                if (document.getElementById('quiz-end-screen')) document.getElementById('quiz-end-screen').style.display = 'none';
+                document.getElementById('quiz-question-screen').style.display = 'block';
+                
+                // Losowanie pytań
+                questionOrder = Array.from({length: quizQuestions.length}, (_, i) => i);
+                shuffleArray(questionOrder);
 
-                showQuestion(quizCurrentIndex);  
-            }  
+                showQuestion(quizCurrentIndex);
+            }
 
-            // Odpowiedź  
-            if (e.target.classList.contains('quiz-btn') && !isWaitingForNext) {  
-                clearInterval(quizInterval);  
+            // Kliknięcie odpowiedzi
+            if (e.target.classList.contains('quiz-btn') && !isWaitingForNext) {
+                clearInterval(quizInterval);
                 isWaitingForNext = true; 
 
-                const btn = e.target;  
-                const questionDiv = quizQuestions[questionOrder[quizCurrentIndex]];  
-                const correctIndex = questionDiv.getAttribute('data-correct');  
-                const selectedIndex = btn.getAttribute('data-index');  
-                  
-                const allBtns = questionDiv.querySelectorAll('.quiz-btn');  
-                allBtns.forEach(b => b.disabled = true);   
-                  
-                if (selectedIndex === correctIndex) {  
-                    btn.style.backgroundColor = 'rgba(40, 167, 69, 0.4)';   
-                    btn.style.borderColor = '#28a745';  
-                    quizScore++;  
-                } else {  
-                    btn.style.backgroundColor = 'rgba(220, 53, 69, 0.4)';   
-                    btn.style.borderColor = '#dc3545';  
-                      
-                    allBtns.forEach(b => {  
-                        if (b.getAttribute('data-index') === correctIndex) {  
-                            b.style.backgroundColor = 'rgba(40, 167, 69, 0.4)';  
-                            b.style.borderColor = '#28a745';  
-                        }  
-                    });  
-                }  
-                  
-                setTimeout(() => {  
-                    quizCurrentIndex++;  
-                    if (quizCurrentIndex < quizQuestions.length) {  
-                        showQuestion(quizCurrentIndex);  
-                    } else {  
-                        endQuiz();  
-                    }  
-                }, 2000);   
-            }  
-        });  
+                const btn = e.target;
+                const questionDiv = quizQuestions[questionOrder[quizCurrentIndex]];
+                const correctIndex = questionDiv.getAttribute('data-correct');
+                const selectedIndex = btn.getAttribute('data-index');
+                
+                const allBtns = questionDiv.querySelectorAll('.quiz-btn');
+                allBtns.forEach(b => b.disabled = true); 
+                
+                // Sprawdzanie i kolorowanie
+                if (selectedIndex === correctIndex) {
+                    btn.style.backgroundColor = 'rgba(40, 167, 69, 0.4)'; 
+                    btn.style.borderColor = '#28a745';
+                    quizScore++;
+                } else {
+                    btn.style.backgroundColor = 'rgba(220, 53, 69, 0.4)'; 
+                    btn.style.borderColor = '#dc3545';
+                    
+                    allBtns.forEach(b => {
+                        if (b.getAttribute('data-index') === correctIndex) {
+                            b.style.backgroundColor = 'rgba(40, 167, 69, 0.4)';
+                            b.style.borderColor = '#28a745';
+                        }
+                    });
+                }
+                
+                // Przejście dalej
+                setTimeout(() => {
+                    quizCurrentIndex++;
+                    if (quizCurrentIndex < quizQuestions.length) {
+                        showQuestion(quizCurrentIndex);
+                    } else {
+                        endQuiz();
+                    }
+                }, 2000); 
+            }
+        });
 
-        function showQuestion(index) {  
-            quizQuestions.forEach(q => q.style.display = 'none');  
-              
-            let realIndex = questionOrder[index];  
-            let currentQ = quizQuestions[realIndex];  
-            currentQ.style.display = 'block';  
+        function showQuestion(index) {
+            quizQuestions.forEach(q => q.style.display = 'none');
+            
+            let realIndex = questionOrder[index];
+            let currentQ = quizQuestions[realIndex];
+            currentQ.style.display = 'block';
 
-            let titleElement = currentQ.querySelector('.update-title');  
-            if (!titleElement.dataset.originalText) {  
-                titleElement.dataset.originalText = titleElement.innerText.replace(/^\d+\.\s*/, '');  
-            }  
-            titleElement.innerText = `${index + 1}. ${titleElement.dataset.originalText}`;  
-              
-            document.getElementById('quiz-progress').innerText = `Pytanie ${index + 1}/${quizQuestions.length}`;  
-              
-            // TASOWANIE ODPOWIEDZI  
-            const optionsContainer = currentQ.querySelector('.quiz-options');  
-            let btns = Array.from(optionsContainer.querySelectorAll('.quiz-btn'));  
-              
-            btns.forEach(btn => {  
-                btn.style.backgroundColor = '';  
-                btn.style.borderColor = '';  
-                btn.disabled = false;  
-                  
-                if (!btn.dataset.rawText) {  
-                    btn.dataset.rawText = btn.innerText.replace(/^[A-D]\)\s*/, '');  
-                }  
-            });  
-              
-            shuffleArray(btns);  
-              
-            const prefixes = ["A) ", "B) ", "C) ", "D) "];  
-            btns.forEach((btn, idx) => {  
-                btn.innerText = prefixes[idx] + btn.dataset.rawText;  
-                optionsContainer.appendChild(btn);   
-            });  
+            let titleElement = currentQ.querySelector('.update-title');
+            if (!titleElement.dataset.originalText) {
+                titleElement.dataset.originalText = titleElement.innerText.replace(/^\d+\.\s*/, '');
+            }
+            titleElement.innerText = `${index + 1}. ${titleElement.dataset.originalText}`;
+            
+            document.getElementById('quiz-progress').innerText = `Pytanie ${index + 1}/${quizQuestions.length}`;
+            
+            // Tasowanie odpowiedzi wewnątrz pytania
+            const optionsContainer = currentQ.querySelector('.quiz-options');
+            let btns = Array.from(optionsContainer.querySelectorAll('.quiz-btn'));
+            
+            btns.forEach(btn => {
+                btn.style.backgroundColor = '';
+                btn.style.borderColor = '';
+                btn.disabled = false;
+            });
+            
+            shuffleArray(btns);
+            
+            // Zwracamy posortowane wizualnie elementy do DOM. 
+            // Liczniki CSS zrobią literki (A,B,C,D) automatycznie!
+            btns.forEach((btn) => {
+                optionsContainer.appendChild(btn); 
+            });
 
-            isWaitingForNext = false;  
-              
-            // ANIMACJA PASKA CZASU (Zoptymalizowana)
-            quizTimer = 20;   
-            let timerBar = document.getElementById('quiz-timer-bar');  
-              
-            if (timerBar) {  
-                // Reset animacji bez opóźnień
-                timerBar.style.transition = "none";  
-                timerBar.style.width = "100%";  
-                timerBar.style.backgroundColor = "#4CAF50";  
-                  
-                void timerBar.offsetWidth; // Force Reflow 
-                  
-                // Płynne zejście
-                timerBar.style.transition = "width 1s linear, background-color 0.5s";  
-            }  
+            isWaitingForNext = false;
+            
+            // Pasek czasu logicznie zresetowany
+            quizTimer = 20; 
+            let timerBar = document.getElementById('quiz-timer-bar');
+            
+            if (timerBar) {
+                // Szybki "trik" w JS na zresetowanie animacji (reflow)
+                timerBar.style.transition = 'none';
+                timerBar.style.width = '100%';
+                timerBar.style.backgroundColor = '#4CAF50';
+                
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        timerBar.style.transition = 'width 1s linear, background-color 0.5s';
+                    });
+                });
+            }
 
-            clearInterval(quizInterval);  
-            updateTimerVisuals(); // wywołanie natychmiastowe
-              
-            quizInterval = setInterval(() => {  
-                quizTimer--;  
-                updateTimerVisuals();  
-                  
-                if (quizTimer <= 0) {  
-                    clearInterval(quizInterval);  
-                    handleTimeOut(currentQ);  
-                }  
-            }, 1000);  
-        }  
+            clearInterval(quizInterval);
+            
+            quizInterval = setInterval(() => {
+                quizTimer--;
+                updateTimerVisuals();
+                
+                if (quizTimer <= 0) {
+                    clearInterval(quizInterval);
+                    handleTimeOut(currentQ);
+                }
+            }, 1000);
+        }
 
-        function updateTimerVisuals() {  
-            let timerBar = document.getElementById('quiz-timer-bar');  
-            if (!timerBar) return;  
+        function updateTimerVisuals() {
+            let timerBar = document.getElementById('quiz-timer-bar');
+            if (!timerBar) return;
 
-            // Zabezpieczenie przed ujemną wartością
-            let percentage = (Math.max(0, quizTimer) / 20) * 100;  
-            timerBar.style.width = percentage + "%";  
-              
-            if (quizTimer > 10) {  
-                timerBar.style.backgroundColor = "#4CAF50";  
-            } else if (quizTimer > 5) {  
-                timerBar.style.backgroundColor = "#FFEB3B";  
-            } else {  
-                timerBar.style.backgroundColor = "#F44336";  
-            }  
-        }  
+            let percentage = (Math.max(0, quizTimer) / 20) * 100;
+            timerBar.style.width = percentage + "%";
+            
+            if (quizTimer > 10) {
+                timerBar.style.backgroundColor = "#4CAF50"; // Zielony
+            } else if (quizTimer > 5) {
+                timerBar.style.backgroundColor = "#FFEB3B"; // Żółty
+            } else {
+                timerBar.style.backgroundColor = "#F44336"; // Czerwony
+            }
+        }
 
-        function handleTimeOut(currentQ) {  
-            isWaitingForNext = true;  
-            const correctIndex = currentQ.getAttribute('data-correct');  
-            const allBtns = currentQ.querySelectorAll('.quiz-btn');  
-              
-            allBtns.forEach(b => {  
-                b.disabled = true;  
-                if (b.getAttribute('data-index') === correctIndex) {  
-                    b.style.backgroundColor = 'rgba(40, 167, 69, 0.4)';   
-                    b.style.borderColor = '#28a745';  
-                }  
-            });  
+        function handleTimeOut(currentQ) {
+            isWaitingForNext = true;
+            const correctIndex = currentQ.getAttribute('data-correct');
+            const allBtns = currentQ.querySelectorAll('.quiz-btn');
+            
+            allBtns.forEach(b => {
+                b.disabled = true;
+                if (b.getAttribute('data-index') === correctIndex) {
+                    b.style.backgroundColor = 'rgba(40, 167, 69, 0.4)'; 
+                    b.style.borderColor = '#28a745';
+                }
+            });
 
-            setTimeout(() => {  
-                quizCurrentIndex++;  
-                if (quizCurrentIndex < quizQuestions.length) {  
-                    showQuestion(quizCurrentIndex);  
-                } else {  
-                    endQuiz();  
-                }  
-            }, 2000);  
-        }  
+            setTimeout(() => {
+                quizCurrentIndex++;
+                if (quizCurrentIndex < quizQuestions.length) {
+                    showQuestion(quizCurrentIndex);
+                } else {
+                    endQuiz();
+                }
+            }, 2000);
+        }
 
-        function endQuiz() {  
-            document.getElementById('quiz-question-screen').style.display = 'none';  
-            document.getElementById('quiz-end-screen').style.display = 'block';  
-            document.getElementById('quiz-score').innerText = quizScore;  
-        }  
-    });  
-</script>  
-</body>  
+        function endQuiz() {
+            document.getElementById('quiz-question-screen').style.display = 'none';
+            document.getElementById('quiz-end-screen').style.display = 'block';
+            document.getElementById('quiz-score').innerText = quizScore;
+        }
+    });
+</script>
+</body>
 </html>
