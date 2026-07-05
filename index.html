@@ -24,8 +24,8 @@
         }
 
         body {
-            /* Tło zablokowane na pl1.png */
             background-color: #121212;
+            background-image: url('pl1.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -37,7 +37,6 @@
             overflow-x: hidden;
         }
 
-        /* Przyciemnienie tła (overlay) */
         .bg-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -312,13 +311,17 @@
         .modal-body::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
 
         /* --- STYLE GRY --- */
-        .falling-flag {
+        .falling-item {
             position: absolute;
-            font-size: 35px;
-            top: -40px;
+            width: 50px;
+            height: 50px;
+            top: -60px;
             transform: translateX(-50%);
             pointer-events: none;
             user-select: none;
+            /* Box-shadow nada delikatną głębię zdjęciom */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            border-radius: 6px;
         }
 
         footer {
@@ -356,7 +359,6 @@
     <div class="category-section">
         <h3 class="category-header">Gry</h3>
         <div class="tabs-container">
-            <!-- Poniżej zmieniono na Game.html -->
             <button class="tab-trigger open-modal-btn" data-file="Game.html" data-title="🎮 GRY – ŁAPANIE FLAGI 🇵🇱">
                 <span class="icon">🎮</span>
                 <span>Łapanie Flagi</span>
@@ -391,10 +393,6 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        
-        // --- ZABLOKOWANE TŁO (pl1.png) ---
-        document.body.style.backgroundImage = `url('pl1.png')`;
-
         // --- LICZNIK DO UPDATE ---
         const countdownElement = document.getElementById("countdown");
         const countDownDate = new Date("2026-07-07T10:00:00").getTime();
@@ -435,10 +433,60 @@
         // --- ZMIENNE DO NOWEJ GRY ---
         let gameTime = 30;
         let gameScore = 0;
+        let highScore = localStorage.getItem('polishUpdateHighScore') || 0;
         let gameTimerInterval = null;
         let gameLoopId = null;
         let isGamePlaying = false;
         let flagSpawnTimeout = null;
+        
+        // --- SYSTEM DŹWIĘKÓW (Web Audio API) ---
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+            
+            if (type === 'good') {
+                // Przyjemny ping
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, now); // Wysoki ton A5
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'bad') {
+                // Brzęczyk błędu/bomby
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now); // Niski ton
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'end') {
+                // Krótki gong na koniec gry
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(220, now + 0.6);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            }
+        }
 
         openModalBtns.forEach(btn => {
             btn.addEventListener('click', function() {
@@ -460,13 +508,22 @@
                         .then(data => {
                             modalBodyContent.innerHTML = data;
                             currentLoadedFile = fileToLoad;
-                            endGame(false); // Bezpieczne zatrzymanie w razie przeładowania
+                            
+                            // Aktualizuj najlepszy wynik w UI po załadowaniu pliku Game.html
+                            const highScoreDisplay = document.getElementById('high-score-display');
+                            if(highScoreDisplay) highScoreDisplay.innerText = highScore;
+                            
+                            endGame(false); 
                         })
                         .catch(error => {
                             modalBodyContent.innerHTML = '<p style="text-align:center; padding: 30px; color:#ff4d4d;">Nie udało się załadować danych z pliku ' + fileToLoad + '.</p>';
                             currentLoadedFile = ''; 
                             console.error('Błąd fetch:', error);
                         });
+                } else {
+                    // Jeśli ten sam plik był już załadowany, po prostu zaktualizuj highscore
+                    const highScoreDisplay = document.getElementById('high-score-display');
+                    if(highScoreDisplay) highScoreDisplay.innerText = highScore;
                 }
             });
         });
@@ -474,7 +531,7 @@
         function closeModal() {
             modalOverlay.classList.remove('active');
             document.body.style.overflow = ''; 
-            endGame(false); // Zatrzymuje logikę gry przy zamknięciu
+            endGame(false); 
         }
 
         if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
@@ -484,10 +541,10 @@
             });
         }
 
-        // --- SILNIK NOWEJ GRY (Event Delegation) ---
+        // --- SILNIK NOWEJ GRY ---
         modalBodyContent.addEventListener('click', function(e) {
-            // Start lub Restart
             if (e.target.id === 'start-game-btn' || e.target.id === 'retry-game-btn') {
+                initAudio(); // Inicjalizacja dźwięku po interakcji (wymóg przeglądarek)
                 startGame();
             }
         });
@@ -507,8 +564,8 @@
             const gameArea = document.getElementById('game-area');
             const basket = document.getElementById('basket');
             
-            // Czyszczenie starych flag
-            gameArea.querySelectorAll('.falling-flag').forEach(f => f.remove());
+            // Czyszczenie starych elementów
+            gameArea.querySelectorAll('.falling-item').forEach(f => f.remove());
 
             // Kontrola Koszyka
             let areaRect = gameArea.getBoundingClientRect();
@@ -519,9 +576,9 @@
                 areaRect = gameArea.getBoundingClientRect();
                 let xPos = clientX - areaRect.left;
                 
-                // Zabezpieczenie przed wyjściem za krawędzie
-                if(xPos < 25) xPos = 25;
-                if(xPos > areaRect.width - 25) xPos = areaRect.width - 25;
+                // Płynne ograniczenia, żeby koszyk nie wyjechał (uwzględnia środek koszyka = 35px, bo całość ma 70px)
+                if(xPos < 35) xPos = 35;
+                if(xPos > areaRect.width - 35) xPos = areaRect.width - 35;
                 
                 basket.style.left = xPos + 'px';
             }
@@ -546,56 +603,77 @@
                 }
             }, 1000);
 
-            // Spawner i Pętla
+            // Spawner
             clearTimeout(flagSpawnTimeout);
             cancelAnimationFrame(gameLoopId);
             
-            function spawnFlag() {
+            function spawnItem() {
                 if(!isGamePlaying) return;
-                const flag = document.createElement('div');
-                flag.innerText = '🇵🇱';
-                flag.className = 'falling-flag';
+                const item = document.createElement('div');
+                item.className = 'falling-item';
                 
+                // Szansa 25% na bombę, 75% na zdjęcie
+                const isBomb = Math.random() < 0.25; 
+                let imgName = '';
+
+                if (isBomb) {
+                    const bombNum = Math.floor(Math.random() * 3) + 1; // od 1 do 3
+                    imgName = `Bomb${bombNum}.png`;
+                    item.dataset.type = 'bomb';
+                } else {
+                    const fotoNum = Math.floor(Math.random() * 10) + 1; // od 1 do 10
+                    imgName = `Gamefoto${fotoNum}.png`;
+                    item.dataset.type = 'good';
+                }
+
+                item.style.background = `url('${imgName}') center/cover no-repeat`;
+
                 // Losowa pozycja X
-                const spawnX = Math.floor(Math.random() * (areaRect.width - 50) + 25);
-                flag.style.left = spawnX + 'px';
+                const spawnX = Math.floor(Math.random() * (areaRect.width - 60) + 30);
+                item.style.left = spawnX + 'px';
                 
-                flag.dataset.y = -40;
-                // Szybkość opadania
-                flag.dataset.speed = Math.random() * 3 + 2.5; 
+                item.dataset.y = -60;
+                item.dataset.speed = 3.5; // Stała prędkość spadania
                 
-                gameArea.appendChild(flag);
+                gameArea.appendChild(item);
 
-                // Kolejna flaga pojawia się za np. 300 do 700 ms
-                flagSpawnTimeout = setTimeout(spawnFlag, Math.random() * 400 + 300); 
+                // Odstęp między pojawianiem się zdjęć (Stałe 900 ms)
+                flagSpawnTimeout = setTimeout(spawnItem, 900); 
             }
-            spawnFlag();
+            spawnItem();
 
+            // Silnik poruszania klatek gry
             function updateGame() {
                 if(!isGamePlaying) return;
-                const flags = gameArea.querySelectorAll('.falling-flag');
+                const items = gameArea.querySelectorAll('.falling-item');
                 const basketRect = basket.getBoundingClientRect();
                 
-                flags.forEach(flag => {
-                    let y = parseFloat(flag.dataset.y) + parseFloat(flag.dataset.speed);
-                    flag.dataset.y = y;
-                    flag.style.top = y + 'px';
+                items.forEach(item => {
+                    let y = parseFloat(item.dataset.y) + parseFloat(item.dataset.speed);
+                    item.dataset.y = y;
+                    item.style.top = y + 'px';
 
-                    // Hitbox / Kolizje
-                    const flagRect = flag.getBoundingClientRect();
+                    // Hitbox / Kolizje z tolerancją na krawędzie
+                    const itemRect = item.getBoundingClientRect();
                     
-                    // Jeśli flaga wejdzie w obszar koszyka
-                    if(flagRect.bottom >= basketRect.top + 15 && 
-                       flagRect.top <= basketRect.bottom &&
-                       flagRect.right >= basketRect.left && 
-                       flagRect.left <= basketRect.right) {
+                    if(itemRect.bottom >= basketRect.top + 20 && 
+                       itemRect.top <= basketRect.bottom &&
+                       itemRect.right >= basketRect.left + 15 && 
+                       itemRect.left <= basketRect.right - 15) {
                         
-                        gameScore++;
+                        if (item.dataset.type === 'bomb') {
+                            gameScore = Math.max(0, gameScore - 2); // Bomba -2 pkt (nie mniej niż 0)
+                            playSound('bad');
+                        } else {
+                            gameScore++; // Dobre zdjęcie +1 pkt
+                            playSound('good');
+                        }
+
                         document.getElementById('game-score-display').innerText = gameScore;
-                        flag.remove();
+                        item.remove();
                         
-                    } else if (y > areaRect.height) { // Zniknięcie poza ekranem
-                        flag.remove();
+                    } else if (y > areaRect.height) { // Usunięcie po wypadnięciu za ekran
+                        item.remove();
                     }
                 });
 
@@ -605,15 +683,26 @@
         }
 
         function endGame(showScreen = false) {
+            if (isGamePlaying && showScreen) {
+                playSound('end'); // Dźwięk końca gry
+            }
+
             isGamePlaying = false;
             clearInterval(gameTimerInterval);
             clearTimeout(flagSpawnTimeout);
             cancelAnimationFrame(gameLoopId);
             
+            // Zapis najlepszego wyniku
+            if (gameScore > highScore) {
+                highScore = gameScore;
+                localStorage.setItem('polishUpdateHighScore', highScore);
+            }
+            
             if (showScreen) {
                 if(document.getElementById('game-play-screen')) document.getElementById('game-play-screen').style.display = 'none';
                 if(document.getElementById('game-end-screen')) document.getElementById('game-end-screen').style.display = 'block';
                 if(document.getElementById('final-score')) document.getElementById('final-score').innerText = gameScore;
+                if(document.getElementById('final-highscore')) document.getElementById('final-highscore').innerText = highScore;
             }
         }
     });
