@@ -441,6 +441,9 @@
             // Przywrócenie płynności na odliczanie w dół
             timerBar.style.transition = "width 1s linear, background-color 0.5s";
             
+            // WYWOŁANIE POCZĄTKOWE: Pasek natychmiast zaczyna zjeżdżać (niweluje to 1-sekundowy "zaciach" na starcie)
+            updateTimerVisuals();
+            
             // Uruchomienie odliczania
             timerInterval = setInterval(() => {
                 timeLeft--;
@@ -467,7 +470,8 @@
         }
 
         function updateTimerVisuals() {
-            let percentage = (timeLeft / 20) * 100;
+            // ZMIANA MATEMATYCZNA: Odejmujemy 1, aby animacja CSS poprowadziła pasek precyzyjnie do samej wartości 0%
+            let percentage = (Math.max(0, timeLeft - 1) / 20) * 100;
             timerBar.style.width = percentage + "%";
             
             // Kolorowanie wg progów
@@ -499,4 +503,3 @@
     });
     </script>
 </div>
-
