@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -324,6 +325,33 @@
             will-change: transform; 
         }
 
+        /* --- STYLE PRZYCISKU WYCISZANIA MUZYKI --- */
+        .music-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+        }
+        
+        .music-toggle:hover {
+            background: rgba(220, 53, 69, 0.6);
+            transform: scale(1.1);
+        }
+
         footer {
             margin-top: auto;
             padding: 20px;
@@ -337,7 +365,8 @@
 <body>
 <div class="bg-overlay"></div>
 
-<!-- Odtwarzacz muzyki lobby -->
+<button id="musicToggleBtn" class="music-toggle">🔇</button>
+
 <audio id="lobbyMusic" src="Music.mp3" loop></audio>
 
 <header>
@@ -402,19 +431,42 @@
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         
-        // --- SYSTEM MUZYKI LOBBY ---
+        // --- SYSTEM MUZYKI LOBBY (Z PRZYCISKIEM KONTROLI) ---
         const lobbyMusic = document.getElementById("lobbyMusic");
-        
-        function startMusic() {
-            if (lobbyMusic && lobbyMusic.paused) {
-                lobbyMusic.play().catch(err => console.log("Autoplay zablokowany, czekam na interakcję."));
-                // Usuwamy nasłuchiwanie po pierwszym udanym uruchomieniu
-                document.removeEventListener("click", startMusic);
-                document.removeEventListener("touchstart", startMusic);
-            }
+        const musicToggleBtn = document.getElementById("musicToggleBtn");
+        let isMusicAllowed = false;
+
+        if (musicToggleBtn && lobbyMusic) {
+            lobbyMusic.volume = 0.5; // Domyślna głośność startowa 50%
+
+            musicToggleBtn.addEventListener("click", () => {
+                if (lobbyMusic.paused) {
+                    lobbyMusic.play().then(() => {
+                        musicToggleBtn.innerText = "🔊";
+                        isMusicAllowed = true;
+                    }).catch(err => console.log("Odtwarzanie zablokowane:", err));
+                } else {
+                    lobbyMusic.pause();
+                    musicToggleBtn.innerText = "🔇";
+                    isMusicAllowed = false;
+                }
+            });
+
+            // Inteligentne tło - spróbuj odpalić muzykę po pierwszej dowolnej interakcji ze stroną, 
+            // jeśli użytkownik wcześniej nie zablokował odtwarzania ręcznie.
+            const autoPlayOnInteraction = () => {
+                if (lobbyMusic.paused && !isMusicAllowed) {
+                    lobbyMusic.play().then(() => {
+                        musicToggleBtn.innerText = "🔊";
+                        isMusicAllowed = true;
+                    }).catch(e => {}); 
+                }
+                document.removeEventListener("click", autoPlayOnInteraction);
+                document.removeEventListener("touchstart", autoPlayOnInteraction);
+            };
+            document.addEventListener("click", autoPlayOnInteraction);
+            document.addEventListener("touchstart", autoPlayOnInteraction);
         }
-        document.addEventListener("click", startMusic);
-        document.addEventListener("touchstart", startMusic);
         
         // --- PRELOADING OBRAZKÓW DLA PŁYNNOŚCI GRY ---
         const preloadedImages = [];
@@ -666,7 +718,7 @@
                 
                 item.dataset.x = spawnX;
                 item.dataset.y = -60;
-                item.style.transform = `translate(${spawnX}px, -60pxpx)`;
+                item.style.transform = `translate(${spawnX}px, -60px)`;
                 item.dataset.speed = 5.0; 
                 
                 gameArea.appendChild(item);
